@@ -1,0 +1,90 @@
+---
+title: "JLo_Course9_Week3_HW"
+author: "Joyce Lo"
+date: "March 14, 2018"
+output:
+  ioslides_presentation: default
+  beamer_presentation: default
+  slidy_presentation: default
+---
+
+```{r setup, include=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+suppressPackageStartupMessages(suppressWarnings(suppressMessages(library("plotly", quietly=T))))
+```
+
+## Analysis on Wine and Spirits
+- In the next few slides, we will analyze wines and spirits sold at BC Liquor Stores
+- Specifically, we shall examine if there is any correlation between:
+    + Alcohol Content and Class of Liquor
+
+
+## Download and Format Data
+- I am commenting some commands out because you only need it run once
+
+```{r downloaddata, results='hide'}
+#fileURL <- "http://pub.data.gov.bc.ca/datasets/176284/BC_Liquor_Store_Product_Price_List.csv"
+#if(!file.exists("data")){dir.create("data")}
+#download.file(fileURL, destfile = "./data/liquor.csv")
+liquor <- read.csv("./data/liquor.csv")
+
+#Remove rows with NA
+liquor2 <- na.omit(liquor)
+
+
+```
+
+- Next, I will create a box plot that shows Alcohol Content by Liquor Class
+- The graph is interactive so you can filter by Country of Origin of the liquor!
+
+
+## Plot Alcohol Content by Liquor Class
+
+```{r boxplot, echo=FALSE, message=FALSE, warning=FALSE}
+library(plotly)
+q <- list(
+  title = ""
+)
+p <- liquor2 %>%
+  plot_ly(
+    type='box',
+    y = ~PRODUCT_ALCOHOL_PERCENT,
+    x = ~PRODUCT_CLASS_NAME,
+    color = ~PRODUCT_CLASS_NAME,
+    text = ~PRODUCT_COUNTRY_ORIGIN_NAME,
+    hoverinfo = 'text',
+    mode = 'markers',
+    transforms = list(
+      list(
+        type = 'filter',
+        target = ~PRODUCT_COUNTRY_ORIGIN_NAME,
+        operation = '=',
+        value = unique(liquor2$PRODUCT_COUNTRY_ORIGIN_NAME)[1]
+      )
+    )) %>% layout(
+        xaxis = q,
+        updatemenus = list(
+        list(
+          type = 'dropdown',
+          active = 0,
+          buttons = list(
+            list(method = 'restyle',
+                 args=list('transforms[0].value', unique(liquor2$PRODUCT_COUNTRY_ORIGIN_NAME)[1]),
+                 label = unique(liquor2$PRODUCT_COUNTRY_ORIGIN_NAME)[1]),
+            list(method = 'restyle',
+                 args=list('transforms[0].value', unique(liquor2$PRODUCT_COUNTRY_ORIGIN_NAME)[2]),
+                 label = unique(liquor2$PRODUCT_COUNTRY_ORIGIN_NAME)[2]),
+            list(method = 'restyle',
+                 args=list('transforms[0].value', unique(liquor2$PRODUCT_COUNTRY_ORIGIN_NAME)[3]),
+                 label = unique(liquor2$PRODUCT_COUNTRY_ORIGIN_NAME)[3])
+          )
+        )
+      )
+    )     
+  
+p
+#plot_ly(liquor2, y= ~PRODUCT_ALCOHOL_PERCENT, color = ~PRODUCT_CLASS_NAME, type='box')
+```
+
+## End of Presentation
+- Thank you!
